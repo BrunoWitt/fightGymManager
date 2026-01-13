@@ -1,6 +1,9 @@
 import bcrypt
 from database import connect_db, close_db
 from pydantic import BaseModel
+from fastapi import APIRouter, Request, HTTPException, Depends
+import jwt
+from jwt import PyJWTError
 
 class User(BaseModel):
     user_id: int
@@ -37,3 +40,18 @@ def validate_user_account(email: str, password: str) -> User | bool:
         return User(user_id=user_id, role=role)
     
     return False
+
+def get_current_user(request: Request):
+    token = request.cookies.get("auth_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    try:
+        payload = jwt.decode(token, "secret_key", algorithms=["HS256"])
+    except PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    return {
+        "user_id": payload.get("sub"),
+        "role": payload.get("role"),
+    }

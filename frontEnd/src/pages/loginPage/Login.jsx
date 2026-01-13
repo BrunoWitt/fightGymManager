@@ -6,14 +6,16 @@ export default function Home() {
     const [password, setPassword] = useState("")
 
     const handleLogin = async (e) => {
+        /* Call backend login route to validate user credentials */
         e.preventDefault()
         console.log("Email:", email)
         console.log("Password:", password)
 
         try {
-            const response = await fetch(" http://127.0.0.1:8000/login", {
+            const response = await fetch(" http://127.0.0.1:8001/login", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
+                credentials: 'include',
                 body: JSON.stringify({email, password})
             })
             const data = await response.json()
@@ -22,15 +24,11 @@ export default function Home() {
             if (!response.ok || !data.success) {
                 console.error("Login failed:", data.message || "Unknown error");
                 return;
+                //Adicionar parte do JWT para ficar armazernado nos cookies o role e user_id
             }
         } catch (error) {
             console.error("Error during login request:", error)
-        } finally {
-            // Limpar os campos após a tentativa de login
-            setEmail("")
-            setPassword("")
         }
-        //Adicionar função para requistar o login para o backend
     }
 
     return (
