@@ -5,10 +5,31 @@ export default function Home() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault()
         console.log("Email:", email)
         console.log("Password:", password)
+
+        try {
+            const response = await fetch(" http://127.0.0.1:8000/login", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({email, password})
+            })
+            const data = await response.json()
+            console.log(data)
+
+            if (!response.ok || !data.success) {
+                console.error("Login failed:", data.message || "Unknown error");
+                return;
+            }
+        } catch (error) {
+            console.error("Error during login request:", error)
+        } finally {
+            // Limpar os campos após a tentativa de login
+            setEmail("")
+            setPassword("")
+        }
         //Adicionar função para requistar o login para o backend
     }
 

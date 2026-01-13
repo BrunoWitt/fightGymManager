@@ -1,6 +1,15 @@
 from fastapi import FastAPI
 from routes.login_route import router as login_router
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
 app.include_router(login_router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],  # ajuste conforme seu React
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
