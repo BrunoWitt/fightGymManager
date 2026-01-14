@@ -64,7 +64,7 @@ def get_current_user(request: Request):
     connection = connect_db()
     cursor = connection.cursor()
     query = "SELECT nome, email FROM users WHERE user_id = %s"
-    cursor.execute(query, payload.get("sub"))
+    cursor.execute(query, (payload.get("sub")),)
     result = cursor.fetchone()
     close_db(connection)
 
