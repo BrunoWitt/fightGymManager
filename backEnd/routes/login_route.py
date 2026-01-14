@@ -52,5 +52,18 @@ async def login(request: LoginRequest):
 
 @router.get("/me")
 def me(user=Depends(get_current_user)):
-    #necessito validar isso aqui pois está incompleto
-    return {"authenticated": True, **user}
+    """validate in every page if the user is logged. 
+
+    Args:
+        user (_type_, optional): _description_. Defaults to Depends(get_current_user).
+
+    Returns:
+        dict: _user information extracted from JWT token
+    """
+    return {
+        "authenticated": True,
+        "user_id": user.get("sub"),
+        "role": user.get("role"),
+        "nome": user.get("nome"),
+        "email": user.get("email")
+    }

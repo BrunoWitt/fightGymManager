@@ -24,7 +24,6 @@ export default function Home() {
             if (!response.ok || !data.success) {
                 console.error("Login failed:", data.message || "Unknown error");
                 return;
-                //Adicionar parte do JWT para ficar armazernado nos cookies o role e user_id
             }
         } catch (error) {
             console.error("Error during login request:", error)
