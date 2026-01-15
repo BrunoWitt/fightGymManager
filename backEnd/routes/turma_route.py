@@ -2,7 +2,7 @@ from fastapi import FastAPI, APIRouter
 from fastapi.responses import JSONResponse
 
 from database import connect_db, close_db
-from services.turma_service import getTurmaDB, updateTurmaDB
+from services.turma_service import getTurmaDB, updateTurmaDB, deleteTurmaDB
 
 router = APIRouter(prefix="/turmas")
 
@@ -42,3 +42,4 @@ async def updateTurma(turma_id: int, changes: dict):
 @router.delete("/{turma_id}/delete")
 async def deleteTurma(turma_id: int):
     """Frontend só clica no botão de deletar"""
+    return JSONResponse(deleteTurmaDB(turma_id))

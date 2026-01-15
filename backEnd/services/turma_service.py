@@ -68,3 +68,19 @@ def updateTurmaDB(turma_id: id, changes: dict):
         raise
     finally:
         close_db(connection)
+
+def deleteTurmaDB(turma_id: int):
+    
+    try:
+        connection = connect_db()
+        cursor = connection.cursor()
+        
+        query = "DELETE FROM turma WHERE id = %s"
+        cursor.execute(query, (turma_id,))
+        connection.commit()
+        
+        return {"result": "Turma deletada com sucesso!"}
+    except Exception:
+        raise
+    finally:
+        close_db(connection)
