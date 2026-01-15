@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from database import connect_db, close_db
-from services.alunos_service import registerAlunoDB, editAlunoDB
+from services.alunos_service import registerAlunoDB, editAlunoDB, deleteAlunoDB
 
 router = APIRouter(prefix="/alunos")
 
@@ -11,8 +11,8 @@ router = APIRouter(prefix="/alunos")
 parte dos alunos
 sistema crud
 detalhes do aluno - read
-cadastrar aluno - create
-editar aluno - edit
+cadastrar aluno - create X
+editar aluno - edit X
 deletar aluno - delete
 
 detalhes do aluno: pagamentos, modalidades que faz
@@ -22,6 +22,11 @@ class AlunoRequest(BaseModel):
     nome: str
     email: str
     turmas: list
+
+
+"""helpers"""
+
+
 
 @router.post("/register")
 async def registrarAluno(request: AlunoRequest):
@@ -35,6 +40,14 @@ async def registrarAluno(request: AlunoRequest):
     """
     return JSONResponse(registerAlunoDB(request.nome, request.email, request.turmas))
 
+
 @router.put("/{aluno_id}/edit")
-async def editAluno(request: AlunoRequest):
-    return JSONResponse(editAlunoDB(request.nome, request.email, request.turmas))
+async def editAluno(aluno_id: int, request: AlunoRequest):
+    return JSONResponse(editAlunoDB(aluno_id, request.nome, request.email, request.turmas))
+
+
+@router.delete("/{aluno_id}/delete")
+async def deleteAluno(aluno_id: int):
+    return JSONResponse(deleteAlunoDB(aluno_id))
+
+

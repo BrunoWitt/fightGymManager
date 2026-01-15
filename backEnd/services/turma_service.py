@@ -145,3 +145,35 @@ def createTurmaDB(nome: str, professor: str, horarios: list):
         raise
     finally:
         close_db(connection)
+
+
+def deleteAlunoDB(aluno_id: int):
+    if not aluno_id:
+        return {"result": "erro", "message": "aluno_id é obrigatório"}
+
+    connection = connect_db()
+    try:
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT aluno_id FROM alunos WHERE aluno_id = %s", (aluno_id,))
+        if not cursor.fetchone():
+            return {"result": "erro", "message": "Aluno não encontrado"}
+
+        cursor.execute(
+            "UPDATE alunos SET ativo = FALSE WHERE aluno_id = %s",
+            (aluno_id,)
+        )
+
+        cursor.execute(
+            "UPDATE aluno_turma SET ativo = FALSE WHERE aluno_id = %s",
+            (aluno_id,)
+        )
+
+        connection.commit()
+        return {"result": "sucesso"}
+
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        close_db(connection)
