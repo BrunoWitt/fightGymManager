@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from database import connect_db, close_db
-from services.alunos_service import registerAlunoDB
+from services.alunos_service import registerAlunoDB, editAlunoDB
 
 router = APIRouter(prefix="/alunos")
 
@@ -25,4 +25,16 @@ class AlunoRequest(BaseModel):
 
 @router.post("/register")
 async def registrarAluno(request: AlunoRequest):
+    """register a new student with the current month already paid
+
+    Args:
+        request (AlunoRequest): name, email and classes
+
+    Returns:
+        json: return a json {"result": "message"}
+    """
     return JSONResponse(registerAlunoDB(request.nome, request.email, request.turmas))
+
+@router.put("/{aluno_id}/edit")
+async def editAluno(request: AlunoRequest):
+    return JSONResponse(editAlunoDB(request.nome, request.email, request.turmas))
