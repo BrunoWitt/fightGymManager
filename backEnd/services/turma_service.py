@@ -70,7 +70,11 @@ def updateTurmaDB(turma_id: id, changes: dict):
         close_db(connection)
 
 def deleteTurmaDB(turma_id: int):
+    """
+    delete a existing class
     
+    :param turma_id: id of selected class
+    """
     try:
         connection = connect_db()
         cursor = connection.cursor()
@@ -86,6 +90,13 @@ def deleteTurmaDB(turma_id: int):
         close_db(connection)
 
 def createTurmaDB(nome: str, professor: str, horarios: list):
+    """
+    create a new class on database
+    
+    :param nome: name of the class
+    :param professor: the teacher of the class(teacher need to be a existing user created by the admin on database)
+    :param horarios: a list with dict to put initials horarys
+    """
     
     try:
         connection = connect_db()

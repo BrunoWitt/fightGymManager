@@ -10,25 +10,14 @@ router = APIRouter(prefix="/turmas")
 class TurmaRequest(BaseModel):
     nome: str
     professor: str
-    horarios: dict
-
-"""
-Crud de turma
-Criar turma post
-Ler turma get X
-Editar turma put X
-Deletar turma delete X
-
-Endpoints:
-/
-"""
+    horarios: list
 
 @router.get("/{turma_id}")
 async def getTurma(turma_id: int):
     """frontend dá o numero id da turma(ques está no db) e ele irá carregar devolvendo as informações daquela turma
 
     Args:
-        turma (int): _description_
+        turma (int): id da turma
     """
     """Frontend envia o numero de id da turma para carregar as informações dela para edição, leitura ou delete.
 
@@ -43,11 +32,23 @@ async def getTurma(turma_id: int):
 @router.put("/{turma_id}/update")
 async def updateTurma(turma_id: int, changes: dict):
     """Frontend terá escolhido a turma com opções id, quando clicar em salvar será carregado todas as mudanças dos horarios completos"""
+    """update a existing class
+
+    Returns:
+        json: return a json to frontend with message
+    """
     return JSONResponse(updateTurmaDB(turma_id, changes))
 
 @router.delete("/{turma_id}/delete")
 async def deleteTurma(turma_id: int):
-    """Frontend só clica no botão de deletar"""
+    """delete the actual selectead class
+
+    Args:
+        turma_id (int): class id
+
+    Returns:
+        json: return a json to frontend with message
+    """
     return JSONResponse(deleteTurmaDB(turma_id))
 
 @router.post("/create")
