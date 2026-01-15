@@ -25,7 +25,15 @@ class AlunoRequest(BaseModel):
 
 
 """helpers"""
-
+@router.get("/")
+async def listAlunos():
+    connection = connect_db()
+    cursor = connection.cursor()
+    cursor.execute("SELECT aluno_id, nome, email, ativo FROM alunos ORDER BY id ASC")
+    rows = cursor.fetchall()
+    close_db(connection)
+    
+    return JSONResponse([{"aluno_id": r[0], "nome": r[1], "email": r[2], "ativo": [3]} for r in rows])
 
 
 @router.post("/register")
