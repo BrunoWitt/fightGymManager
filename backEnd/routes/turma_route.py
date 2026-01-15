@@ -12,6 +12,36 @@ class TurmaRequest(BaseModel):
     professor: str
     horarios: list
 
+"""Helpers"""
+@router.get("/")
+async def listTurmas():
+    connection = connect_db()
+    cursor = connection.cursor()
+    cursor.execute("SELECT id, nome, professor FROM turma ORDER BY id ASC")
+    rows = cursor.fetchall()
+    close_db(connection)
+    return JSONResponse([{"id": r[0], "nome": r[1], "professor": r[2]} for r in rows])
+
+
+@router.get("/users")
+async def listUsers(role: str | None = None):
+    connection = connect_db()
+    cursor = connection.cursor()
+
+    if role:
+        cursor.execute("SELECT user_id, nome, email, role FROM users WHERE role = %s ORDER BY nome ASC", (role,))
+    else:
+        cursor.execute("SELECT user_id, nome, email, role FROM users ORDER BY nome ASC")
+
+    rows = cursor.fetchall()
+    close_db(connection)
+
+    return JSONResponse([
+        {"user_id": r[0], "nome": r[1], "email": r[2], "role": r[3]}
+        for r in rows
+    ])
+
+
 @router.get("/{turma_id}")
 async def getTurma(turma_id: int):
     """frontend dá o numero id da turma(ques está no db) e ele irá carregar devolvendo as informações daquela turma
@@ -29,6 +59,7 @@ async def getTurma(turma_id: int):
     """
     return JSONResponse(getTurmaDB(turma_id))
 
+
 @router.put("/{turma_id}/update")
 async def updateTurma(turma_id: int, changes: dict):
     """Frontend terá escolhido a turma com opções id, quando clicar em salvar será carregado todas as mudanças dos horarios completos"""
@@ -38,6 +69,7 @@ async def updateTurma(turma_id: int, changes: dict):
         json: return a json to frontend with message
     """
     return JSONResponse(updateTurmaDB(turma_id, changes))
+
 
 @router.delete("/{turma_id}/delete")
 async def deleteTurma(turma_id: int):
@@ -50,6 +82,7 @@ async def deleteTurma(turma_id: int):
         json: return a json to frontend with message
     """
     return JSONResponse(deleteTurmaDB(turma_id))
+
 
 @router.post("/create")
 async def createTurma(request: TurmaRequest):

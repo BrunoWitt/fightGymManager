@@ -54,7 +54,7 @@ def updateTurmaDB(turma_id: id, changes: dict):
         
         cursor.execute("UPDATE turma SET professor = %s WHERE id = %s", (changes["professor"], turma_id))
         cursor.execute("UPDATE turma SET nome = %s WHERE id = %s", (changes["nome"], turma_id))
-        cursor.execute("DELETE FROM turma_horario WHERE id = %s", (turma_id,))
+        cursor.execute("DELETE FROM turma_horario WHERE turma_id = %s", (turma_id,))
         
         query = "INSERT INTO turma_horario (turma_id, dia_semana, hora_inicio, hora_fim) VALUES (%s, %s, %s, %s)"
         values = [(turma_id, h["dia_semana"], h["hora_inicio"], h["hora_fim"])
