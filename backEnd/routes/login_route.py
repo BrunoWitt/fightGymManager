@@ -31,7 +31,6 @@ async def login(request: LoginRequest):
     
     exp = datetime.now(timezone.utc) + timedelta(days=7)
     
-    #Precisa fazer a parte do JWT para ficar armazenado nos cookies o role e user_id
     token = jwt.encode({
         "sub": str(user.user_id),
         "role": user.role,
@@ -39,8 +38,9 @@ async def login(request: LoginRequest):
         "iat": datetime.now(timezone.utc)
     }, "secret_key", algorithm="HS256")
     
-    response = JSONResponse (content={"success": True, "message": "Login successful"})
-    response.set_cookie(
+    response = JSONResponse (content={"success": True, "message": "Login successful"}) #Em caso de sucesso é criado o response
+    
+    response.set_cookie( #Aqui seta o cookie no navegador para futuras requisições
         key="auth_token",
         value=token,
         httponly=True,
@@ -48,6 +48,7 @@ async def login(request: LoginRequest):
         samesite="lax",
         expires=exp
     )
+    
     return response #Retorna com sucesso se tem ou não o login e está salvando de forma correta no dev tools com segurança
 
 @router.get("/me")
