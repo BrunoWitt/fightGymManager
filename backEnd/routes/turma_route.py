@@ -1,17 +1,23 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from database import connect_db, close_db
-from services.turma_service import getTurmaDB, updateTurmaDB, deleteTurmaDB
+from services.turma_service import getTurmaDB, updateTurmaDB, deleteTurmaDB, createTurmaDB
 
 router = APIRouter(prefix="/turmas")
+
+class TurmaRequest(BaseModel):
+    nome: str
+    professor: str
+    horarios: dict
 
 """
 Crud de turma
 Criar turma post
 Ler turma get X
 Editar turma put X
-Deletar turma delete 
+Deletar turma delete X
 
 Endpoints:
 /
@@ -43,3 +49,15 @@ async def updateTurma(turma_id: int, changes: dict):
 async def deleteTurma(turma_id: int):
     """Frontend só clica no botão de deletar"""
     return JSONResponse(deleteTurmaDB(turma_id))
+
+@router.post("/create")
+async def createTurma(request: TurmaRequest):
+    """create a new class in database
+
+    Args:
+        request (TurmaRequest): all informations to pull in database
+
+    Returns:
+        json: return a jsonresponse with success mensage
+    """
+    return JSONResponse(createTurmaDB(request.nome, request.professor, request.horarios))
