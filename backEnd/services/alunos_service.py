@@ -1,11 +1,14 @@
 from database import connect_db, close_db
+from psycopg2.extras import RealDictCursor
 from datetime import date
+import json
 
 VALOR_POR_TURMA = 160.00
 
 """helpers"""
 def _first_day_of_month(d: date) -> date:
     return date(d.year, d.month, 1)
+
 
 def registerAlunoDB(nome: str, email: str, turmas: list):
     """
@@ -198,6 +201,106 @@ def editAlunoDB(aluno_id: int, nome: str, email: str, turmas: list):
 
         connection.commit()
         return {"result": "sucesso"}
+
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        close_db(connection)
+
+
+def deleteAlunoDB(aluno_id: int):
+    pass
+
+
+def detailAlunoDB(aluno_id: int):
+    if not aluno_id:
+        return {"result": "erro", "message": "aluno_id é obrigatório"}
+
+    connection = connect_db()
+    try:
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
+
+        cursor.execute(
+            """
+            SELECT
+                a.aluno_id,
+                a.nome,
+                a.email,
+                a.ativo,
+
+                -- turmas ativas do aluno
+                COALESCE(
+                    (
+                        SELECT json_agg(
+                            jsonb_build_object('id', t.id, 'nome', t.nome)
+                            ORDER BY t.id
+                        )
+                        FROM aluno_turma at
+                        JOIN turma t ON t.id = at.turma_id
+                        WHERE at.aluno_id = a.aluno_id
+                            AND at.ativo = TRUE
+                    ),
+                    '[]'::json
+                ) AS turmas,
+
+                -- histórico de pagamentos + turmas de cada pagamento
+                COALESCE(
+                    (
+                        SELECT json_agg(
+                            jsonb_build_object(
+                                'id', ap.id,
+                                'mes', to_char(ap.mes, 'YYYY-MM-DD'),
+                                'quantia', (ap.quantia::float),
+                                'pago', ap.pago,
+                                'vencimento', CASE
+                                    WHEN ap.vencimento IS NULL THEN NULL
+                                    ELSE to_char(ap.vencimento, 'YYYY-MM-DD')
+                                END,
+                                'pago_em', CASE
+                                    WHEN ap.pago_em IS NULL THEN NULL
+                                    ELSE to_char(ap.pago_em, 'YYYY-MM-DD"T"HH24:MI:SS')
+                                END,
+                                'observacao', ap.observacao,
+
+                                'turmas', COALESCE(
+                                    (
+                                        SELECT json_agg(
+                                            jsonb_build_object('id', t2.id, 'nome', t2.nome)
+                                            ORDER BY t2.id
+                                        )
+                                        FROM pagamento_turma pt
+                                        JOIN turma t2 ON t2.id = pt.turma_id
+                                        WHERE pt.pagamento_id = ap.id
+                                    ),
+                                    '[]'::json
+                                )
+                            )
+                            ORDER BY ap.mes DESC
+                        )
+                        FROM alunos_pagamentos ap
+                        WHERE ap.aluno_id = a.aluno_id
+                    ),
+                    '[]'::json
+                ) AS pagamentos
+
+            FROM alunos a
+            WHERE a.aluno_id = %s
+            """,
+            (aluno_id,)
+        )
+
+        row = cursor.fetchone()
+        if not row:
+            return {"result": "erro", "message": "Aluno não encontrado"}
+
+        # dependendo da config do psycopg2, json pode vir como string
+        if isinstance(row.get("turmas"), str):
+            row["turmas"] = json.loads(row["turmas"])
+        if isinstance(row.get("pagamentos"), str):
+            row["pagamentos"] = json.loads(row["pagamentos"])
+
+        return {"result": "sucesso", "data": row}
 
     except Exception:
         connection.rollback()
