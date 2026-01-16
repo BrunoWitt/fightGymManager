@@ -9,6 +9,7 @@ from services.login_service import get_current_user
 
 router = APIRouter(prefix="")
 
+
 class LoginRequest(BaseModel):
     email: str
     password: str
@@ -50,6 +51,7 @@ async def login(request: LoginRequest):
     )
     
     return response #Retorna com sucesso se tem ou não o login e está salvando de forma correta no dev tools com segurança
+
 
 @router.get("/me")
 def me(user=Depends(get_current_user)):

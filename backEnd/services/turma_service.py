@@ -38,6 +38,7 @@ def getTurmaDB(turma_id: int):
         "horarios": horarios,
     }
 
+
 def updateTurmaDB(turma_id: id, changes: dict):
     """Update das turmas no banco de dados para realizar as mudanças. 
     
@@ -79,6 +80,7 @@ def updateTurmaDB(turma_id: id, changes: dict):
     finally:
         close_db(connection)
 
+
 def deleteTurmaDB(turma_id: int):
     """
     delete a existing class
@@ -98,6 +100,7 @@ def deleteTurmaDB(turma_id: int):
         raise
     finally:
         close_db(connection)
+
 
 def createTurmaDB(nome: str, professor: str, horarios: list):
     """
