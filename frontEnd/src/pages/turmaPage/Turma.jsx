@@ -62,6 +62,7 @@ export default function Turma() {
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState("");
 
+
     // Carrega turmas (dropdown)
     useEffect(() => {
         (async () => {
@@ -75,6 +76,7 @@ export default function Turma() {
         }
         })();
     }, []);
+
 
     // Carrega professores (role=professor)
     useEffect(() => {
@@ -130,6 +132,7 @@ export default function Turma() {
         })();
     }, [selectedTurmaId, timeSlots]);
 
+
     function addRow() {
         const first = timeSlots[0];
         setRows((prev) => [
@@ -138,9 +141,11 @@ export default function Turma() {
         ]);
     }
 
+
     function removeRow(rowId) {
         setRows((prev) => prev.filter((r) => r.rowId !== rowId));
     }
+
 
     function toggleCell(rowId, diaId) {
         setRows((prev) =>
@@ -151,6 +156,7 @@ export default function Turma() {
         );
     }
 
+
     function changeTime(rowId, value) {
         // value = "08:00|09:00"
         const [start, end] = value.split("|");
@@ -159,6 +165,7 @@ export default function Turma() {
         );
     }
 
+    
     async function onSave() {
         if (!selectedTurmaId) {
         setMsg("Selecione uma turma antes de salvar.");
