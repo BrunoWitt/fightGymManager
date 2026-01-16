@@ -25,7 +25,7 @@ export default function AlunoDetailsModal({ open, alunoId, onClose, api, onEdit 
   // Recomendado: GET /alunos/{aluno_id}/detalhes
     const detailsPath = useMemo(() => {
         if (!alunoId) return null;
-        return `/alunos/${alunoId}/detalhes`;
+        return `/alunos/${alunoId}/details`;
     }, [alunoId]);
 
     useEffect(() => {
@@ -55,9 +55,12 @@ export default function AlunoDetailsModal({ open, alunoId, onClose, api, onEdit 
         };
     }, [open, detailsPath, api]);
 
-    const aluno = detalhe?.aluno || detalhe || null;
-    const turmas = detalhe?.turmas || aluno?.turmas || [];
-    const pagamentos = detalhe?.pagamentos || [];
+    const payload = detalhe?.data ?? detalhe;
+
+    const aluno = payload?.aluno ?? payload ?? null;
+    const turmas = payload?.turmas ?? aluno?.turmas ?? [];
+    const pagamentos = payload?.pagamentos ?? aluno?.pagamentos ?? [];
+
 
     return (
         <Modal
