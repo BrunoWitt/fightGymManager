@@ -1,9 +1,12 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.responses import JSONResponse
+from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
+import json
 
 from database import connect_db, close_db
-from services.alunos_service import registerAlunoDB, editAlunoDB, deleteAlunoDB
+from services.alunos_service import registerAlunoDB, editAlunoDB, deleteAlunoDB, detailAlunoDB
+
 
 router = APIRouter(prefix="/alunos")
 
@@ -25,15 +28,42 @@ class AlunoRequest(BaseModel):
 
 
 """helpers"""
-@router.get("/")
+@router.get("")
 async def listAlunos():
     connection = connect_db()
-    cursor = connection.cursor()
-    cursor.execute("SELECT aluno_id, nome, email, ativo FROM alunos ORDER BY id ASC")
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
+
+    cursor.execute("""
+        SELECT
+            a.aluno_id,
+            a.nome,
+            a.email,
+            a.ativo,
+            COALESCE(
+                json_agg(
+                    DISTINCT jsonb_build_object('id', t.id, 'nome', t.nome)
+                ) FILTER (WHERE t.id IS NOT NULL),
+                '[]'::json
+            ) AS turmas
+        FROM alunos a
+        LEFT JOIN aluno_turma at
+            ON at.aluno_id = a.aluno_id
+            AND at.ativo = TRUE
+        LEFT JOIN turma t
+            ON t.id = at.turma_id
+        GROUP BY a.aluno_id, a.nome, a.email, a.ativo
+        ORDER BY a.aluno_id ASC
+    """)
+
     rows = cursor.fetchall()
     close_db(connection)
-    
-    return JSONResponse([{"aluno_id": r[0], "nome": r[1], "email": r[2], "ativo": [3]} for r in rows])
+
+    # dependendo da config do psycopg2, "turmas" pode vir como string json
+    for r in rows:
+        if isinstance(r.get("turmas"), str):
+            r["turmas"] = json.loads(r["turmas"])
+
+    return JSONResponse(rows)
 
 
 @router.post("/register")
@@ -57,5 +87,12 @@ async def editAluno(aluno_id: int, request: AlunoRequest):
 @router.delete("/{aluno_id}/delete")
 async def deleteAluno(aluno_id: int):
     return JSONResponse(deleteAlunoDB(aluno_id))
+
+
+"""Parte de detalhes"""
+
+@router.get("/{aluno_id}/details")
+async def detailAluno(aluno_id: int):
+    return JSONResponse(detailAlunoDB(aluno_id))
 
 
