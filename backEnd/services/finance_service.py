@@ -16,12 +16,27 @@ def list_pagamentos_mes_db(mes_ref: date):
                 ap.aluno_id,
                 a.nome,
                 a.email,
-                ap.mes,
+
+                -- converte date para string
+                to_char(ap.mes, 'YYYY-MM-DD') AS mes,
+
                 ap.quantia::float AS quantia,
                 ap.pago,
-                ap.vencimento,
-                ap.pago_em,
+
+                -- converte date para string (ou null)
+                CASE
+                    WHEN ap.vencimento IS NULL THEN NULL
+                    ELSE to_char(ap.vencimento, 'YYYY-MM-DD')
+                END AS vencimento,
+
+                -- converte timestamp para string ISO-like
+                CASE
+                    WHEN ap.pago_em IS NULL THEN NULL
+                    ELSE to_char(ap.pago_em, 'YYYY-MM-DD"T"HH24:MI:SS')
+                END AS pago_em,
+
                 ap.observacao,
+
                 COALESCE(
                     (
                         SELECT json_agg(
@@ -41,6 +56,8 @@ def list_pagamentos_mes_db(mes_ref: date):
         """, (mes_ref,))
 
         rows = cursor.fetchall()
+
+        # se vier string, ok. se vier json como string, converte.
         for r in rows:
             if isinstance(r.get("turmas"), str):
                 r["turmas"] = json.loads(r["turmas"])
@@ -228,23 +245,47 @@ def list_despesas_db(competencia: date):
     connection = connect_db()
     try:
         cursor = connection.cursor(cursor_factory=RealDictCursor)
+
         cursor.execute("""
             SELECT
                 id,
                 descricao,
                 categoria,
-                competencia,
+
+                -- date -> string
+                to_char(competencia, 'YYYY-MM-DD') AS competencia,
+
                 valor::float AS valor,
-                vencimento,
+
+                CASE
+                    WHEN vencimento IS NULL THEN NULL
+                    ELSE to_char(vencimento, 'YYYY-MM-DD')
+                END AS vencimento,
+
                 pago,
-                pago_em,
+
+                CASE
+                    WHEN pago_em IS NULL THEN NULL
+                    ELSE to_char(pago_em, 'YYYY-MM-DD"T"HH24:MI:SS')
+                END AS pago_em,
+
                 observacao,
-                created_at,
-                updated_at
+
+                CASE
+                    WHEN created_at IS NULL THEN NULL
+                    ELSE to_char(created_at, 'YYYY-MM-DD"T"HH24:MI:SS')
+                END AS created_at,
+
+                CASE
+                    WHEN updated_at IS NULL THEN NULL
+                    ELSE to_char(updated_at, 'YYYY-MM-DD"T"HH24:MI:SS')
+                END AS updated_at
+
             FROM despesas
             WHERE competencia = %s
             ORDER BY categoria ASC, descricao ASC
         """, (competencia,))
+
         rows = cursor.fetchall()
         return {"result": "sucesso", "data": rows}
     finally:
