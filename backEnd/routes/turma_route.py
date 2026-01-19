@@ -1,6 +1,7 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from datetime import datetime
 
 from database import connect_db, close_db
 from services.turma_service import getTurmaDB, updateTurmaDB, deleteTurmaDB, createTurmaDB
@@ -23,6 +24,44 @@ async def listTurmas():
     return JSONResponse([{"id": r[0], "nome": r[1], "professor": r[2]} for r in rows])
 
 
+@router.get("/hoje")
+async def turmasHoje():
+    dia = datetime.now().isoweekday()
+
+    connection = connect_db()
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT
+            t.id,
+            t.nome,
+            t.professor,
+            th.dia_semana,
+            th.hora_inicio,
+            th.hora_fim
+        FROM turma t
+        JOIN turma_horario th ON th.turma_id = t.id
+        WHERE th.dia_semana = %s
+        ORDER BY th.hora_inicio ASC
+    """, (dia,))
+
+    rows = cursor.fetchall()
+    close_db(connection)
+
+    return JSONResponse([
+        {
+            "turma_id": r[0],
+            "nome": r[1],
+            "professor": r[2],
+            "dia_semana": r[3],
+            "hora_inicio": str(r[4]),
+            "hora_fim": str(r[5]),
+        }
+        for r in rows
+    ])
+
+
+"""Tela de turma"""
 @router.get("/users")
 async def listUsers(role: str | None = None):
     connection = connect_db()
