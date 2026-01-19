@@ -9,3 +9,41 @@
 body {
   margin: 0;
 }
+
+/* ===== FullCalendar: ajustes visuais ===== */
+.agenda-cal .fc {
+  /* deixa o calendário “mais largo” e menos comprimido */
+  --fc-border-color: #e4e4e7; /* zinc-200 */
+}
+
+/* reduz a altura das linhas do mês */
+.agenda-cal .fc .fc-daygrid-day-frame {
+  min-height: 72px;           /* ajuste aqui: 60~90 costuma ficar ótimo */
+}
+
+/* diminui o número do dia */
+.agenda-cal .fc .fc-daygrid-day-number {
+  font-size: 0.75rem;         /* 12px */
+  line-height: 1rem;
+  padding: 6px 8px;           /* menos “alto” */
+  color: #18181b;             /* zinc-900 */
+}
+
+/* reduz padding interno do topo da célula */
+.agenda-cal .fc .fc-daygrid-day-top {
+  padding: 2px;
+}
+
+/* deixa o cabeçalho (dom, seg, ter...) mais discreto */
+.agenda-cal .fc .fc-col-header-cell-cushion {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 8px 0;
+  color: #3f3f46; /* zinc-700 */
+}
+
+/* tira um pouco do “ar” geral do grid */
+.agenda-cal .fc .fc-scrollgrid {
+  border-radius: 12px;
+  overflow: hidden;
+}
