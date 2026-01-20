@@ -1,4 +1,4 @@
-from fastapi import APIRouter, FastAPI, Depends
+from fastapi import APIRouter, FastAPI, Depends, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from datetime import datetime, timedelta, timezone
@@ -41,28 +41,21 @@ async def login(request: LoginRequest):
     
     response = JSONResponse (content={"success": True, "message": "Login successful"}) #Em caso de sucesso é criado o response
     
-    response.set_cookie( #Aqui seta o cookie no navegador para futuras requisições
+    response.set_cookie(
         key="auth_token",
         value=token,
         httponly=True,
-        secure=False,
-        samesite="lax",
-        expires=exp
+        secure=False,     # HTTP (DEV)
+        samesite="lax",   # ✅ melhor para HTTP
+        path="/"
     )
     
     return response #Retorna com sucesso se tem ou não o login e está salvando de forma correta no dev tools com segurança
 
 
 @router.get("/me")
-def me(user=Depends(get_current_user)):
-    """validate in every page if the user is logged. 
-
-    Args:
-        user (_type_, optional): _description_. Defaults to Depends(get_current_user).
-
-    Returns:
-        dict: _user information extracted from JWT token
-    """
+def me(request: Request, user=Depends(get_current_user)):
+    print("COOKIES NO /me:", request.cookies)
     return {
         "authenticated": True,
         "user_id": user.get("sub"),

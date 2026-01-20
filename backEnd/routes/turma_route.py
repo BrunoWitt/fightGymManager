@@ -1,12 +1,13 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from datetime import datetime
 
 from database import connect_db, close_db
 from services.turma_service import getTurmaDB, updateTurmaDB, deleteTurmaDB, createTurmaDB
+from services.login_service import get_current_user
 
-router = APIRouter(prefix="/turmas")
+router = APIRouter(prefix="/turmas", dependencies=[Depends(get_current_user)])
 
 class TurmaRequest(BaseModel):
     nome: str

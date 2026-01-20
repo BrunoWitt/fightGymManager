@@ -5,19 +5,21 @@ import Turma from "../pages/turmaPage/Turma";
 import Aluno from "../pages/alunosPage/Alunos";
 import Finance from "../pages/financePage/FinancePage";
 import AppLayout from "../layout/AppLayout";
+import ProtectedRoute from "./ProtectedRoute";
 
 export default function AppRoutes() {
     return (
         <Routes>
-        <Route path="/login" element={<Login />} />
-
-        <Route element={<AppLayout />}>
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/turmas" element={<Turma />} />
-            <Route path="/alunos" element={<Aluno />} />
-            <Route path="/finance" element={<Finance />} />
-        </Route>
+            <Route path="/login" element={<Login />} />
+                <Route element={<ProtectedRoute />}>
+                    <Route element={<AppLayout />}>
+                    <Route path="/" element={<Navigate to="/home" replace />} />
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/turmas" element={<Turma />} />
+                    <Route path="/alunos" element={<Aluno />} />
+                    <Route path="/finance" element={<Finance />} />
+                </Route>
+            </Route>
         </Routes>
     );
 }

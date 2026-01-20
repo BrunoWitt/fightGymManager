@@ -29,6 +29,11 @@ function firstDayOfMonthYMD(date) {
 }
 
 export default function Home() {
+
+    useEffect(() => {
+        callAPI("/me")
+    }, [])
+
     const [classesToday, setClassesToday] = useState([]);
     const [loadingToday, setLoadingToday] = useState(false);
 

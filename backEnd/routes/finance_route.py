@@ -16,7 +16,7 @@ from services.finance_service import (
     set_despesa_status_db,
 )
 
-router = APIRouter(prefix="/financeiro")
+router = APIRouter(prefix="/financeiro", dependencies=[Depends(get_current_user)])
 
 # Helpers
 def _parse_mes(mes_str: str) -> date:

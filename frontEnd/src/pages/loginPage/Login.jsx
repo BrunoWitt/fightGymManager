@@ -1,7 +1,8 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 export default function Home() {
-
+    const navigate = useNavigate()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
@@ -25,6 +26,9 @@ export default function Home() {
                 console.error("Login failed:", data.message || "Unknown error");
                 return;
             }
+
+            navigate("/home")
+
         } catch (error) {
             console.error("Error during login request:", error)
         }

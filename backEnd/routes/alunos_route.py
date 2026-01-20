@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Depends
 from fastapi.responses import JSONResponse
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
@@ -6,9 +6,9 @@ import json
 
 from database import connect_db, close_db
 from services.alunos_service import registerAlunoDB, editAlunoDB, deleteAlunoDB, detailAlunoDB
+from services.login_service import get_current_user
 
-
-router = APIRouter(prefix="/alunos")
+router = APIRouter(prefix="/alunos", dependencies=[Depends(get_current_user)])
 
 """
 parte dos alunos

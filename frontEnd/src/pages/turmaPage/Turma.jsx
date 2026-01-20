@@ -67,7 +67,10 @@ export default function Turma() {
     useEffect(() => {
         (async () => {
         try {
-            const res = await fetch(`${API_URL}/turmas`);
+            const res = await fetch(`${API_URL}/turmas`, {
+                method: "get",
+                credentials: "include"
+            });
             if (!res.ok) throw new Error("Falha ao carregar turmas");
             const data = await res.json();
             setTurmas(data);
@@ -82,7 +85,9 @@ export default function Turma() {
     useEffect(() => {
         (async () => {
         try {
-            const res = await fetch(`${API_URL}/turmas/users`); //Rota temporaria depois tem que mudar para /users
+            const res = await fetch(`${API_URL}/turmas/users`, {
+                credentials: 'include'
+            }); //Rota temporaria depois tem que mudar para /users
             if (!res.ok) throw new Error("Falha ao carregar professores");
             const data = await res.json();
             setProfessores(data);
@@ -106,7 +111,9 @@ export default function Turma() {
         setLoading(true);
         setMsg("");
         try {
-            const res = await fetch(`${API_URL}/turmas/${selectedTurmaId}`);
+            const res = await fetch(`${API_URL}/turmas/${selectedTurmaId}`, {
+                credentials: 'include'
+            });
             if (!res.ok) throw new Error("Falha ao carregar turma selecionada");
             const data = await res.json();
 
@@ -202,6 +209,7 @@ export default function Turma() {
         const res = await fetch(`${API_URL}/turmas/${selectedTurmaId}/update`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify(payload),
         });
 
