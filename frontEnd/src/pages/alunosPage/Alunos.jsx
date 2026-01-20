@@ -7,16 +7,16 @@ import AlunoFormModal from "./components/AlunoFormModal";
 
 const API_URL = import.meta.env.VITE_API_URL
 
-//Cria uma função geral para chamar o banco(facilita a vida)
+// função padrão de API
 async function api(path, options = {}) {
     const res = await fetch(`${API_URL}${path}`, {
         headers: { "Content-Type": "application/json" },
-        credentials: 'include',
+        credentials: "include",
         ...options,
     });
 
-    //Todos os routes retornam json então da pra criar esse padrão
     const data = await res.json().catch(() => null);
+
     if (!res.ok) {
         const msg = data?.message || data?.detail || "Erro na requisição";
         throw new Error(msg);
@@ -32,33 +32,35 @@ export default function Alunos() {
     const [filters, setFilters] = useState({
         q: "",
         turmaId: "todas",
-        ativo: "todos", // todos | ativos | inativos
-        pagoMes: "todos", // todos | pagos | pendentes
-        sort: "nome_asc", // nome_asc | nome_desc | mais_recente
+        ativo: "todos",
+        pagoMes: "todos",
+        sort: "nome_asc",
     });
 
     const [detailsOpen, setDetailsOpen] = useState(false);
     const [selectedAlunoId, setSelectedAlunoId] = useState(null);
 
     const [formOpen, setFormOpen] = useState(false);
-    const [formMode, setFormMode] = useState("create"); // create | edit
+    const [formMode, setFormMode] = useState("create");
     const [formInitial, setFormInitial] = useState(null);
 
     async function loadBase() {
         setLoading(true);
         try {
-        // 1) lista alunos (mínimo)
         const alunosData = await api("/alunos");
         setAlunos(Array.isArray(alunosData) ? alunosData : []);
 
-        // 2) lista turmas (assumido que exista endpoint)
-        // Se você ainda não tiver, pode comentar isso por enquanto.
+        // ✅ Evita 307 do FastAPI: rota é /turmas/
         try {
-            const turmasData = await api("/turmas");
+            const turmasData = await api("/turmas/");
             setTurmas(Array.isArray(turmasData) ? turmasData : []);
         } catch {
             setTurmas([]);
         }
+        } catch (e) {
+        console.error(e);
+        setAlunos([]);
+        setTurmas([]);
         } finally {
         setLoading(false);
         }
@@ -70,10 +72,8 @@ export default function Alunos() {
 
     const alunosFiltrados = useMemo(() => {
         const q = (filters.q || "").trim().toLowerCase();
-
         let list = [...alunos];
 
-        // filtro por texto (nome/email)
         if (q) {
         list = list.filter((a) => {
             const nome = (a.nome || "").toLowerCase();
@@ -82,52 +82,44 @@ export default function Alunos() {
         });
         }
 
-        // ativo/inativo
         if (filters.ativo !== "todos") {
         const wantActive = filters.ativo === "ativos";
         list = list.filter((a) => Boolean(a.ativo) === wantActive);
         }
 
-        // turma/modalidade (precisa vir no payload como a.turmas = [{id,nome}] ou a.turmas_ids)
         if (filters.turmaId !== "todas") {
         const turmaIdNum = Number(filters.turmaId);
         list = list.filter((a) => {
             const ids =
-            Array.isArray(a.turmas_ids) ? a.turmas_ids :
-            Array.isArray(a.turmas) ? a.turmas.map((t) => t.id) :
-            [];
+            Array.isArray(a.turmas_ids)
+                ? a.turmas_ids
+                : Array.isArray(a.turmas)
+                ? a.turmas.map((t) => t.id)
+                : [];
             return ids.includes(turmaIdNum);
         });
         }
 
-        // pago do mês (precisa vir como a.pago_mes_atual boolean)
         if (filters.pagoMes !== "todos") {
-        if (filters.pagoMes === "pagos") {
-            list = list.filter((a) => a.pago_mes_atual === true);
-        } else if (filters.pagoMes === "pendentes") {
-            list = list.filter((a) => a.pago_mes_atual === false);
-        }
+        if (filters.pagoMes === "pagos") list = list.filter((a) => a.pago_mes_atual === true);
+        if (filters.pagoMes === "pendentes") list = list.filter((a) => a.pago_mes_atual === false);
         }
 
-        // ordenação
         if (filters.sort === "nome_asc") {
         list.sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
         } else if (filters.sort === "nome_desc") {
         list.sort((a, b) => (b.nome || "").localeCompare(a.nome || ""));
         } else if (filters.sort === "mais_recente") {
-        // se você tiver created_at/updated_at no payload, usa aqui
         list.sort((a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0));
         }
 
         return list;
     }, [alunos, filters]);
 
-
     function openDetails(alunoId) {
         setSelectedAlunoId(alunoId);
         setDetailsOpen(true);
     }
-
 
     function openCreate() {
         setFormMode("create");
@@ -135,13 +127,11 @@ export default function Alunos() {
         setFormOpen(true);
     }
 
-
     function openEditFromDetails(alunoDetalhe) {
         setFormMode("edit");
         setFormInitial(alunoDetalhe);
         setFormOpen(true);
     }
-
 
     async function handleSubmitAluno(payload, mode, alunoId) {
         if (mode === "create") {
@@ -152,27 +142,28 @@ export default function Alunos() {
         await loadBase();
     }
 
-
     return (
-        <div className="p-4 md:p-6">
+        <div className="p-4 md:p-6 text-zinc-100">
+        {/* Header */}
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
-            <h1 className="text-xl font-semibold">Alunos</h1>
-            <p className="text-sm text-zinc-500">
+            <h1 className="text-xl font-semibold tracking-tight">Alunos</h1>
+            <p className="text-sm text-zinc-400">
                 Listagem, filtros e detalhes com histórico de pagamentos.
             </p>
             </div>
 
             <button
             onClick={openCreate}
-            className="inline-flex items-center justify-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
+            className="inline-flex items-center justify-center rounded-xl bg-yellow-400 px-4 py-2 text-sm font-semibold text-black hover:bg-yellow-300 active:scale-[0.99]"
             >
             + Cadastrar aluno
             </button>
         </div>
 
-        <div className="rounded-xl border border-zinc-200 bg-white">
-            <div className="border-b border-zinc-200 p-3">
+        {/* Card principal */}
+        <div className="rounded-2xl border border-yellow-400/15 bg-zinc-950/55 shadow-[0_0_0_1px_rgba(250,204,21,0.10)] backdrop-blur">
+            <div className="border-b border-yellow-400/10 p-3">
             <AlunoFilters
                 filters={filters}
                 setFilters={setFilters}
@@ -183,11 +174,7 @@ export default function Alunos() {
             </div>
 
             <div className="p-3">
-            <AlunosTable
-                loading={loading}
-                alunos={alunosFiltrados}
-                onDetails={(id) => openDetails(id)}
-            />
+            <AlunosTable loading={loading} alunos={alunosFiltrados} onDetails={(id) => openDetails(id)} />
             </div>
         </div>
 

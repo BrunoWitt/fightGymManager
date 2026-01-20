@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8001";
+const API_URL = import.meta.env.VITE_API_URL;
 
 async function callAPI(path, options = {}) {
     const response = await fetch(`${API_URL}${path}`, {
@@ -20,7 +20,6 @@ async function callAPI(path, options = {}) {
 }
 
 function formatMesBonito(mesRef) {
-    // mesRef = "YYYY-MM-01"
     const [y, m] = String(mesRef).split("-").map((x) => Number(x));
     const d = new Date(y, (m || 1) - 1, 1);
     const label = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(d);
@@ -34,10 +33,7 @@ export default function PagamentosEmAberto({ mesRef }) {
 
     const mesLabel = useMemo(() => formatMesBonito(mesRef), [mesRef]);
 
-    const emAberto = useMemo(
-        () => (pagamentos || []).filter((p) => p.pago === false),
-        [pagamentos]
-    );
+    const emAberto = useMemo(() => (pagamentos || []).filter((p) => p.pago === false), [pagamentos]);
 
     async function fetchPagamentosDoMes() {
         try {
@@ -65,9 +61,7 @@ export default function PagamentosEmAberto({ mesRef }) {
         });
 
         setPagamentos((prev) =>
-            (prev || []).map((p) =>
-            p.pagamento_id === pagamento_id ? { ...p, pago: true } : p
-            )
+            (prev || []).map((p) => (p.pagamento_id === pagamento_id ? { ...p, pago: true } : p))
         );
         } catch (e) {
         console.error(e);
@@ -77,49 +71,52 @@ export default function PagamentosEmAberto({ mesRef }) {
         }
     }
 
-  // refetch automático quando mudar o mês da agenda
     useEffect(() => {
         fetchPagamentosDoMes();
     }, [mesRef]);
 
     return (
-        <aside className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
-        <div className="flex items-center justify-between">
+        <aside className="rounded-3xl border border-yellow-400/15 bg-zinc-950/60 p-4 shadow-[0_0_0_1px_rgba(250,204,21,0.08)] backdrop-blur">
+        <div className="flex items-start justify-between gap-3">
             <div>
-            <h2 className="text-base font-semibold text-zinc-900">Em aberto</h2>
-            <p className="text-xs text-zinc-500">Mês: <span className="font-medium text-zinc-700">{mesLabel}</span></p>
+            <h2 className="text-base font-extrabold text-white">Em aberto</h2>
+            <p className="text-xs text-zinc-400">
+                Mês: <span className="font-semibold text-zinc-200">{mesLabel}</span>
+            </p>
             </div>
 
-            <button
+        <button
             onClick={fetchPagamentosDoMes}
-            className="text-xs rounded-md border border-zinc-200 px-2 py-1 hover:bg-zinc-50"
+            className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-xs font-semibold text-zinc-200 hover:bg-zinc-900/70 disabled:opacity-60"
             disabled={loading}
             >
-            Atualizar
+            {loading ? "Atualizando..." : "Atualizar"}
             </button>
         </div>
 
         <div className="mt-3">
             {loading ? (
-            <p className="text-sm text-zinc-500">Carregando...</p>
+            <p className="text-sm text-zinc-400">Carregando...</p>
             ) : emAberto.length === 0 ? (
-            <p className="text-sm text-zinc-500">Nenhum pagamento em aberto</p>
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-3 text-sm text-zinc-400">
+                Nenhum pagamento em aberto
+            </div>
             ) : (
             <ul className="space-y-2 max-h-[340px] overflow-auto pr-1">
                 {emAberto.map((p) => (
                 <li
                     key={p.pagamento_id}
-                    className="rounded-xl border border-zinc-200 p-3 flex items-start justify-between gap-3 hover:bg-zinc-50 transition"
+                    className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-3 flex items-start justify-between gap-3 hover:bg-zinc-900/50 transition"
                 >
                     <div className="min-w-0">
-                    <p className="text-sm font-semibold text-zinc-900 truncate">{p.nome}</p>
-                    <p className="text-xs text-zinc-500">
+                    <p className="text-sm font-semibold text-white truncate">{p.nome}</p>
+                    <p className="text-xs text-zinc-400">
                         {p.email} • R$ {Number(p.quantia).toFixed(2)}
                         {p.vencimento ? ` • Venc: ${p.vencimento}` : ""}
                     </p>
 
                     {Array.isArray(p.turmas) && p.turmas.length > 0 ? (
-                        <p className="text-xs text-zinc-500 mt-1">
+                        <p className="text-xs text-zinc-400 mt-1">
                         Turmas: {p.turmas.map((t) => t.nome).join(", ")}
                         </p>
                     ) : null}
@@ -128,7 +125,7 @@ export default function PagamentosEmAberto({ mesRef }) {
                     <button
                     onClick={() => marcarComoPago(p.pagamento_id)}
                     disabled={payingId === p.pagamento_id}
-                    className="text-xs rounded-full px-3 py-1 border border-amber-300 bg-amber-50 hover:bg-amber-100 disabled:opacity-60 whitespace-nowrap"
+                    className="text-xs rounded-full px-3 py-1.5 border border-yellow-400/20 bg-yellow-400/10 text-yellow-200 hover:bg-yellow-400/15 disabled:opacity-60 whitespace-nowrap"
                     >
                     {payingId === p.pagamento_id ? "Salvando..." : "Em aberto"}
                     </button>

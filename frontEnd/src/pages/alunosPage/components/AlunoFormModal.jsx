@@ -6,7 +6,6 @@ export default function AlunoFormModal({ open, mode, initial, turmas, onClose, o
     const isEdit = mode === "edit";
 
     const initialTurmasIds = useMemo(() => {
-        // aceita initial.turmas_ids ou initial.turmas [{id}]
         if (!initial) return [];
         if (Array.isArray(initial.turmas_ids)) return initial.turmas_ids;
         if (Array.isArray(initial.turmas)) return initial.turmas.map((t) => t.id);
@@ -29,37 +28,36 @@ export default function AlunoFormModal({ open, mode, initial, turmas, onClose, o
         setSelectedTurmas(initialTurmasIds || []);
     }, [open, initial, initialTurmasIds]);
 
-
     function toggleTurma(id) {
-        setSelectedTurmas((prev) =>
-        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-        );
+        setSelectedTurmas((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
     }
-
 
     async function handleSave() {
         setErr("");
 
-        if (!nome.trim()) return setErr("Nome é obrigatório.");
-        if (!email.trim()) return setErr("Email é obrigatório.");
-        if (selectedTurmas.length === 0) return setErr("Selecione ao menos 1 turma.");
+    if (!nome.trim()) return setErr("Nome é obrigatório.");
+    if (!email.trim()) return setErr("Email é obrigatório.");
+    if (selectedTurmas.length === 0) return setErr("Selecione ao menos 1 turma.");
 
-        const payload = {
+    const payload = {
         nome: nome.trim(),
         email: email.trim(),
-        turmas: selectedTurmas, // backend espera list
-        };
+        turmas: selectedTurmas,
+    };
 
-        setSaving(true);
+    setSaving(true);
         try {
-        await onSubmit?.(payload, mode, initial?.aluno_id);
-        onClose?.();
+            await onSubmit?.(payload, mode, initial?.aluno_id);
+            onClose?.();
         } catch (e) {
-        setErr(e.message || "Erro ao salvar");
+            setErr(e.message || "Erro ao salvar");
         } finally {
-        setSaving(false);
+            setSaving(false);
         }
     }
+
+    const inputBase =
+    "w-full rounded-xl border border-yellow-400/10 bg-zinc-950/60 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-yellow-400/25 focus:ring-2 focus:ring-yellow-400/10";
 
     return (
         <Modal
@@ -70,14 +68,15 @@ export default function AlunoFormModal({ open, mode, initial, turmas, onClose, o
             <div className="flex items-center justify-end gap-2">
             <button
                 onClick={onClose}
-                className="rounded-lg px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-100"
+                className="rounded-xl border border-yellow-400/10 bg-zinc-900/50 px-3 py-2 text-sm font-semibold text-zinc-200 hover:bg-zinc-900"
                 disabled={saving}
             >
                 Cancelar
             </button>
+
             <button
                 onClick={handleSave}
-                className="rounded-lg bg-zinc-900 px-3 py-2 text-sm text-white hover:bg-zinc-800 disabled:opacity-60"
+                className="rounded-xl bg-yellow-400 px-3 py-2 text-sm font-semibold text-black hover:bg-yellow-300 disabled:opacity-60"
                 disabled={saving}
             >
                 {saving ? "Salvando..." : isEdit ? "Salvar alterações" : "Cadastrar"}
@@ -87,54 +86,60 @@ export default function AlunoFormModal({ open, mode, initial, turmas, onClose, o
         >
         <div className="space-y-4">
             {err ? (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            <div className="rounded-xl border border-rose-400/20 bg-rose-500/10 p-3 text-sm text-rose-200">
                 {err}
             </div>
             ) : null}
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div>
-                <label className="mb-1 block text-xs font-medium text-zinc-600">Nome</label>
-                <input
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400"
-                />
+                <label className="mb-1 block text-xs font-semibold text-zinc-300">Nome</label>
+                <input value={nome} onChange={(e) => setNome(e.target.value)} className={inputBase} />
             </div>
 
             <div>
-                <label className="mb-1 block text-xs font-medium text-zinc-600">Email</label>
+                <label className="mb-1 block text-xs font-semibold text-zinc-300">Email</label>
                 <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
-                className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-400"
+                className={inputBase}
                 />
             </div>
             </div>
 
             <div>
-            <div className="mb-2 text-xs font-medium text-zinc-600">Turmas / Modalidades</div>
+            <div className="mb-2 text-xs font-semibold text-zinc-300">Turmas / Modalidades</div>
 
-            {(!turmas || turmas.length === 0) ? (
-                <div className="text-sm text-zinc-500">
-                Nenhuma turma carregada. (Você precisa de um endpoint <code className="font-mono">GET /turmas</code>.)
+            {!turmas || turmas.length === 0 ? (
+                <div className="text-sm text-zinc-400">
+                Nenhuma turma carregada. (Você precisa de um endpoint{" "}
+                <code className="font-mono text-yellow-200">GET /turmas/</code>.)
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                {turmas.map((t) => (
+                {turmas.map((t) => {
+                    const checked = selectedTurmas.includes(t.id);
+                    return (
                     <label
-                    key={t.id}
-                    className="flex items-center gap-2 rounded-lg border border-zinc-200 p-2 hover:bg-zinc-50"
+                        key={t.id}
+                        className={[
+                        "flex items-center gap-2 rounded-xl border p-2 transition",
+                        checked
+                            ? "border-yellow-400/25 bg-yellow-400/10"
+                            : "border-yellow-400/10 bg-zinc-950/40 hover:bg-zinc-900/50",
+                        ].join(" ")}
                     >
-                    <input
+                        <input
                         type="checkbox"
-                        checked={selectedTurmas.includes(t.id)}
+                        checked={checked}
                         onChange={() => toggleTurma(t.id)}
-                    />
-                    <span className="text-sm text-zinc-800">{t.nome}</span>
+                        className="accent-yellow-400"
+                        />
+                        <span className="text-sm text-zinc-100">{t.nome}</span>
                     </label>
-                ))}
+                    );
+                })}
                 </div>
             )}
             </div>

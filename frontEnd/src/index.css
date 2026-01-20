@@ -47,3 +47,129 @@ body {
   border-radius: 12px;
   overflow: hidden;
 }
+
+/* Dia (fundo da célula) */
+.fc .fc-daygrid-day-frame {
+  background: rgba(9, 9, 11, 0.35) !important; /* mais escuro (zinc-950) */
+}
+
+/* Número do dia */
+.fc .fc-daygrid-day-number {
+  color: rgba(244, 244, 245, 0.92) !important;  /* branco mais forte */
+  font-weight: 800 !important;
+}
+
+/* Dias “fora do mês” (cinza, mas legível) */
+.fc .fc-day-other .fc-daygrid-day-number {
+  color: rgba(161, 161, 170, 0.70) !important; /* zinc-400 */
+}
+
+/* Cabeçalho (dom/seg/...) */
+.fc .fc-col-header-cell-cushion {
+  color: rgba(244, 244, 245, 0.90) !important;
+  font-weight: 800 !important;
+}
+
+/* Linha do cabeçalho (evita ficar branco) */
+.fc .fc-col-header-cell {
+  background: rgba(9, 9, 11, 0.50) !important;
+}
+
+/* Ajuste do “hoje” */
+.fc .fc-day-today {
+  background: rgba(250, 204, 21, 0.10) !important;
+}
+
+html, body, #root {
+  height: 100%;
+  background: #09090b; /* zinc-950 */
+}
+
+/* =========================
+   FullCalendar – Header (dom/seg/...)
+   Tema Classic (Preto/Amarelo)
+   ========================= */
+
+/* a linha do cabeçalho */
+.fc .fc-col-header {
+  background: linear-gradient(
+    180deg,
+    rgba(250, 204, 21, 0.95),
+    rgba(234, 179, 8, 0.92)
+  ) !important;
+  overflow: hidden !important;
+}
+
+/* cada célula do cabeçalho */
+.fc .fc-col-header-cell {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* o texto "dom., seg., ..." */
+.fc .fc-col-header-cell-cushion {
+  color: rgba(9, 9, 11, 0.95) !important; /* quase preto */
+  font-weight: 900 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: lowercase !important;
+  padding: 10px 0 !important;
+  display: block !important;
+}
+
+/* separadores verticais suaves */
+.fc .fc-col-header-cell + .fc-col-header-cell {
+  box-shadow: inset 1px 0 0 rgba(9, 9, 11, 0.18) !important;
+}
+
+/* linha abaixo do header (acabamento) */
+.fc .fc-scrollgrid-section-header td {
+  border-bottom: 1px solid rgba(250, 204, 21, 0.28) !important;
+  box-shadow: 0 8px 24px rgba(250, 204, 21, 0.08) !important;
+}
+
+/* remove bordas “quadradonas” do scrollgrid */
+.fc .fc-scrollgrid,
+.fc .fc-scrollgrid td,
+.fc .fc-scrollgrid th {
+  border-color: rgba(244, 244, 245, 0.14) !important;
+}
+
+.fc .fc-col-header-cell-cushion {
+  font-size: 0.95rem !important;
+}
+
+/* ================================
+   Scrollbar (Classic: Preto/Amarelo)
+   Chrome/Edge/Safari (WebKit)
+   ================================ */
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(9, 9, 11, 0.9); /* zinc-950 */
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(250, 204, 21, 0.55); /* yellow-400 */
+  border-radius: 999px;
+  border: 2px solid rgba(9, 9, 11, 0.95);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(250, 204, 21, 0.8);
+}
+
+*::-webkit-scrollbar-corner {
+  background: rgba(9, 9, 11, 0.9);
+}
+
+/* ================================
+   Firefox
+   ================================ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(250, 204, 21, 0.6) rgba(9, 9, 11, 0.9);
+}
