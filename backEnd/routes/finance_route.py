@@ -30,7 +30,7 @@ def _parse_mes(mes_str: str) -> date:
 
 # Pagamentos (Receitas)
 @router.get("/pagamentos")
-def list_pagamentos(mes: str, user=Depends(get_current_user)):
+def list_pagamentos(mes: str):
     mes_ref = _parse_mes(mes)
     return JSONResponse(list_pagamentos_mes_db(mes_ref))
 
@@ -42,7 +42,7 @@ class GerarPagamentosRequest(BaseModel):
 
 
 @router.post("/pagamentos/gerar")
-def gerar_pagamentos(request: GerarPagamentosRequest, user=Depends(get_current_user)):
+def gerar_pagamentos(request: GerarPagamentosRequest):
     mes_ref = _parse_mes(request.mes)
 
     venc = None
@@ -68,20 +68,20 @@ class PagamentoStatusRequest(BaseModel):
 
 
 @router.put("/pagamentos/{pagamento_id}/status")
-def set_pagamento_status(pagamento_id: int, request: PagamentoStatusRequest, user=Depends(get_current_user)):
+def set_pagamento_status(pagamento_id: int, request: PagamentoStatusRequest):
     return JSONResponse(set_pagamento_status_db(pagamento_id, request.pago, request.observacao))
 
 
 # Resumo / Dashboard
 @router.get("/resumo")
-def resumo(mes: str, user=Depends(get_current_user)):
+def resumo(mes: str):
     mes_ref = _parse_mes(mes)
     return JSONResponse(resumo_mes_db(mes_ref))
 
 
 # Despesas
 @router.get("/despesas")
-def list_despesas(competencia: str, user=Depends(get_current_user)):
+def list_despesas(competencia: str):
     comp = _parse_mes(competencia)
     return JSONResponse(list_despesas_db(comp))
 
@@ -96,7 +96,7 @@ class DespesaRequest(BaseModel):
 
 
 @router.post("/despesas")
-def create_despesa(request: DespesaRequest, user=Depends(get_current_user)):
+def create_despesa(request: DespesaRequest):
     comp = _parse_mes(request.competencia)
 
     venc = None
@@ -115,7 +115,7 @@ def create_despesa(request: DespesaRequest, user=Depends(get_current_user)):
 
 
 @router.put("/despesas/{despesa_id}")
-def update_despesa(despesa_id: int, request: DespesaRequest, user=Depends(get_current_user)):
+def update_despesa(despesa_id: int, request: DespesaRequest):
     comp = _parse_mes(request.competencia)
 
     venc = None
@@ -135,7 +135,7 @@ def update_despesa(despesa_id: int, request: DespesaRequest, user=Depends(get_cu
 
 
 @router.delete("/despesas/{despesa_id}")
-def delete_despesa(despesa_id: int, user=Depends(get_current_user)):
+def delete_despesa(despesa_id: int):
     return JSONResponse(delete_despesa_db(despesa_id))
 
 

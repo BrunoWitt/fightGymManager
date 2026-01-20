@@ -94,5 +94,3 @@ async def deleteAluno(aluno_id: int):
 @router.get("/{aluno_id}/details")
 async def detailAluno(aluno_id: int):
     return JSONResponse(detailAlunoDB(aluno_id))
-
-

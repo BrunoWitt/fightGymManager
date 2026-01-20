@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+const API_URL = import.meta.env.VITE_API_URL
+
 export default function Home() {
     const navigate = useNavigate()
     const [email, setEmail] = useState("")
@@ -13,7 +15,7 @@ export default function Home() {
         console.log("Password:", password)
 
         try {
-            const response = await fetch("http://10.0.0.91:8001/login", {
+            const response = await fetch(`${API_URL}/login`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 credentials: 'include',

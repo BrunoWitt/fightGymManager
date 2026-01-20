@@ -6,7 +6,7 @@ import PaymentsTable from "./components/PaymentsTable";
 import ExpensesTable from "./components/ExpensesTable";
 import ExpenseFormModal from "./components/ExpenseFormModal";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://10.0.0.91:8001";
+const API_URL = import.meta.env.VITE_API_URL
 
 async function api(path, options = {}) {
     const res = await fetch(`${API_URL}${path}`, {

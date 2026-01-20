@@ -5,7 +5,7 @@ import AlunosTable from "./components/AlunosTable";
 import AlunoDetailsModal from "./components/AlunoDetailsModal";
 import AlunoFormModal from "./components/AlunoFormModal";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://10.0.0.91:8001";
+const API_URL = import.meta.env.VITE_API_URL
 
 //Cria uma função geral para chamar o banco(facilita a vida)
 async function api(path, options = {}) {

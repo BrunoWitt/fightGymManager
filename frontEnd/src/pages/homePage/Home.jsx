@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Agenda from "./components/Agenda";
 import PagamentosEmAberto from "./components/PagamentosEmAberto";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://10.0.0.91:8001";
+const API_URL = import.meta.env.VITE_API_URL
 
 async function callAPI(path) {
     const response = await fetch(`${API_URL}${path}`, {

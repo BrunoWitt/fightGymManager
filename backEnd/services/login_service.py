@@ -4,6 +4,9 @@ from pydantic import BaseModel
 from fastapi import APIRouter, Request, HTTPException, Depends
 import jwt
 from jwt import PyJWTError
+from pathlib import Path
+from dotenv import load_dotenv
+import os
 
 class User(BaseModel):
     user_id: int
@@ -42,6 +45,10 @@ def validate_user_account(email: str, password: str) -> User | bool:
     return False
 
 def get_current_user(request: Request):
+    ENV_PATH = Path(__file__).resolve().parent / ".env"
+    load_dotenv(dotenv_path=ENV_PATH)
+    JWT_SECRET = os.getenv("JWT_SECRET")
+    
     """get the current user, validate if the user is logged and if is logged send the role and id
 
     Args:
@@ -55,7 +62,7 @@ def get_current_user(request: Request):
         raise HTTPException(status_code=401, detail="Not authenticated")
     
     try:
-        payload = jwt.decode(token, "secret_key", algorithms=["HS256"])
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
     except PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
     

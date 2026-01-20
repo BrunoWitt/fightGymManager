@@ -3,6 +3,9 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from datetime import datetime, timedelta, timezone
 import jwt
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 
 from services.login_service import validate_user_account
 from services.login_service import get_current_user
@@ -32,12 +35,15 @@ async def login(request: LoginRequest):
     
     exp = datetime.now(timezone.utc) + timedelta(days=7)
     
+    ENV_PATH = Path(__file__).resolve().parent / ".env"
+    load_dotenv(dotenv_path=ENV_PATH)
+    JWT_SECRET = os.getenv("JWT_SECRET")
     token = jwt.encode({
         "sub": str(user.user_id),
         "role": user.role,
         "exp": exp,
         "iat": datetime.now(timezone.utc)
-    }, "secret_key", algorithm="HS256")
+    }, JWT_SECRET, algorithm="HS256")
     
     response = JSONResponse (content={"success": True, "message": "Login successful"}) #Em caso de sucesso é criado o response
     
@@ -45,8 +51,8 @@ async def login(request: LoginRequest):
         key="auth_token",
         value=token,
         httponly=True,
-        secure=False,     # HTTP (DEV)
-        samesite="lax",   # ✅ melhor para HTTP
+        secure="lax", #Lax por conta do cross-site
+        samesite="lax",
         path="/"
     )
     
@@ -54,8 +60,7 @@ async def login(request: LoginRequest):
 
 
 @router.get("/me")
-def me(request: Request, user=Depends(get_current_user)):
-    print("COOKIES NO /me:", request.cookies)
+def me(user=Depends(get_current_user)):
     return {
         "authenticated": True,
         "user_id": user.get("sub"),
