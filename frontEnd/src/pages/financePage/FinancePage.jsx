@@ -6,12 +6,12 @@ import PaymentsTable from "./components/PaymentsTable";
 import ExpensesTable from "./components/ExpensesTable";
 import ExpenseFormModal from "./components/ExpenseFormModal";
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL;
 
 async function api(path, options = {}) {
     const res = await fetch(`${API_URL}${path}`, {
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // importante pro cookie JWT
+        credentials: "include",
         ...options,
     });
 
@@ -29,7 +29,6 @@ function moneyBRL(v) {
 }
 
 function toMesISO(yyyyMM) {
-    // "YYYY-MM" -> "YYYY-MM-01"
     if (!yyyyMM || yyyyMM.length < 7) return null;
     return `${yyyyMM}-01`;
 }
@@ -38,7 +37,7 @@ function toMesISO(yyyyMM) {
     const [monthValue, setMonthValue] = useState(() => {
         const d = new Date();
         const mm = String(d.getMonth() + 1).padStart(2, "0");
-        return `${d.getFullYear()}-${mm}`; // YYYY-MM
+        return `${d.getFullYear()}-${mm}`;
     });
 
     const mesISO = useMemo(() => toMesISO(monthValue), [monthValue]);
@@ -52,8 +51,13 @@ function toMesISO(yyyyMM) {
     const [despesas, setDespesas] = useState([]);
 
     const [expenseOpen, setExpenseOpen] = useState(false);
-    const [expenseMode, setExpenseMode] = useState("create"); // create | edit
+    const [expenseMode, setExpenseMode] = useState("create");
     const [expenseInitial, setExpenseInitial] = useState(null);
+
+  // --- styles base (Classic) ---
+    const card =
+        "rounded-2xl border border-yellow-400/10 bg-zinc-950/35 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] backdrop-blur";
+    const pageWrap = "relative mx-auto max-w-full px-4 py-6 md:px-6 md:py-10";
 
     async function loadAll() {
         if (!mesISO) return;
@@ -108,10 +112,7 @@ function toMesISO(yyyyMM) {
         try {
         await api(`/financeiro/pagamentos/${p.pagamento_id}/status`, {
             method: "PUT",
-            body: JSON.stringify({
-            pago: !p.pago,
-            observacao: null,
-            }),
+            body: JSON.stringify({ pago: !p.pago, observacao: null }),
         });
         await loadAll();
         } catch (e) {
@@ -126,7 +127,7 @@ function toMesISO(yyyyMM) {
         setExpenseInitial({
         descricao: "",
         categoria: "",
-        competencia: mesISO, // já sugere o mês selecionado
+        competencia: mesISO,
         valor: "",
         vencimento: "",
         observacao: "",
@@ -150,10 +151,7 @@ function toMesISO(yyyyMM) {
         setError("");
         try {
         if (expenseMode === "create") {
-            await api(`/financeiro/despesas`, {
-            method: "POST",
-            body: JSON.stringify(payload),
-            });
+            await api(`/financeiro/despesas`, { method: "POST", body: JSON.stringify(payload) });
         } else {
             await api(`/financeiro/despesas/${expenseInitial.id}`, {
             method: "PUT",
@@ -202,33 +200,40 @@ function toMesISO(yyyyMM) {
     }
 
     return (
-        <div className="p-4 md:p-6">
-        <div className="mb-4">
-            <h1 className="text-xl font-semibold">Financeiro</h1>
-            <p className="text-sm text-zinc-500">
+        <div className={pageWrap}>
+        <div className="mb-6">
+            <h1 className="text-2xl font-extrabold tracking-tight text-zinc-100">Financeiro</h1>
+            <p className="mt-1 text-sm text-zinc-400">
             Mensalidades (receitas) e despesas por mês.
             </p>
         </div>
 
-        <FinanceHeader
-            monthValue={monthValue}
-            setMonthValue={setMonthValue}
-            onGerarMes={handleGerarMes}
-            busy={busy}
-        />
+        <div className={card}>
+            <div className="p-4">
+            <FinanceHeader
+                monthValue={monthValue}
+                setMonthValue={setMonthValue}
+                onGerarMes={handleGerarMes}
+                busy={busy}
+            />
+            </div>
+        </div>
 
         {error ? (
-            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            <div className="mt-4 rounded-2xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-200">
             {error}
             </div>
         ) : null}
 
-        <div className="mt-4 rounded-xl border border-zinc-200 bg-white p-3">
+        <div className={`mt-4 ${card}`}>
+            <div className="p-4">
             <SummaryCards loading={loading} resumo={resumo} moneyBRL={moneyBRL} />
+            </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
-            <div className="rounded-xl border border-zinc-200 bg-white p-3">
+        <div className="relative mx-auto w-full px-4 py-6 md:px-6 md:py-10">
+            <div className={card}>
+            <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
             <PaymentsTable
                 loading={loading}
                 rows={pagamentos}
@@ -236,9 +241,7 @@ function toMesISO(yyyyMM) {
                 onTogglePago={togglePagamento}
                 busy={busy}
             />
-            </div>
 
-            <div className="rounded-xl border border-zinc-200 bg-white p-3">
             <ExpensesTable
                 loading={loading}
                 rows={despesas}
@@ -249,6 +252,7 @@ function toMesISO(yyyyMM) {
                 onTogglePago={toggleDespesa}
                 busy={busy}
             />
+            </div>
             </div>
         </div>
 

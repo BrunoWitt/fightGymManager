@@ -1,21 +1,16 @@
-// src/pages/financePage/components/SummaryCards.jsx
 function Card({ title, value, subtitle }) {
     return (
-        <div className="rounded-xl border border-zinc-200 bg-white p-4">
-        <div className="text-xs text-zinc-500">{title}</div>
-        <div className="mt-1 text-lg font-semibold text-zinc-900">{value}</div>
+        <div className="rounded-2xl border border-yellow-400/10 bg-zinc-950/35 p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] backdrop-blur">
+        <div className="text-xs uppercase tracking-wide text-zinc-400">{title}</div>
+        <div className="mt-1 text-lg font-extrabold text-zinc-100">{value}</div>
         {subtitle ? <div className="mt-1 text-xs text-zinc-500">{subtitle}</div> : null}
         </div>
     );
 }
 
 export default function SummaryCards({ loading, resumo, moneyBRL }) {
-    if (loading) {
-        return <div className="text-sm text-zinc-500">Carregando resumo...</div>;
-    }
-    if (!resumo) {
-        return <div className="text-sm text-zinc-500">Sem dados.</div>;
-    }
+    if (loading) return <div className="text-sm text-zinc-400">Carregando resumo...</div>;
+    if (!resumo) return <div className="text-sm text-zinc-400">Sem dados.</div>;
 
     const rec = resumo.receitas || {};
     const desp = resumo.despesas || {};
