@@ -38,6 +38,7 @@ async def login(request: LoginRequest):
     ENV_PATH = Path(__file__).resolve().parent / ".env"
     load_dotenv(dotenv_path=ENV_PATH)
     JWT_SECRET = os.getenv("JWT_SECRET")
+    
     token = jwt.encode({
         "sub": str(user.user_id),
         "role": user.role,

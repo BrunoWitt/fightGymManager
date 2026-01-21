@@ -11,11 +11,6 @@ def connect_db():
     ENV_PATH = Path(__file__).resolve().parent / ".env"
     load_dotenv(dotenv_path=ENV_PATH)
     
-    print("ENV_PATH =", ENV_PATH)
-    print("Existe?  =", ENV_PATH.exists())
-    print("DB_USER  =", os.getenv("DB_USER"))
-    print("DB_PASS definido? =", bool(os.getenv("DB_PASSWORD")))
-    
     return psycopg2.connect(
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
