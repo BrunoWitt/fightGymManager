@@ -55,8 +55,8 @@ async def turmasHoje():
             "nome": r[1],
             "professor": r[2],
             "dia_semana": r[3],
-            "hora_inicio": r[4].strftime("%H:%M"),
-            "hora_fim": r[5].strftime("%H:%M"),
+            "hora_inicio": str(r[4]),
+            "hora_fim": str(r[5]),
         }
         for r in rows
     ])

@@ -17,8 +17,8 @@ def getTurmaDB(turma_id: int):
     for dia, ini, fim in rows:
         item = {
             "dia_semana": dia,
-            "hora_inicio": ini.strftime("%H:%M"),
-            "hora_fim": fim.strftime("%H:%M"),
+            "hora_inicio": str(ini),
+            "hora_fim": str(fim),
         }
         horarios.append(item)
     """list compression nova forma de fazer também

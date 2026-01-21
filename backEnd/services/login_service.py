@@ -45,7 +45,7 @@ def validate_user_account(email: str, password: str) -> User | bool:
     return False
 
 def get_current_user(request: Request):
-    ENV_PATH = Path(__file__).resolve().parents[1] / ".env"
+    ENV_PATH = Path(__file__).resolve().parent / ".env"
     load_dotenv(dotenv_path=ENV_PATH)
     JWT_SECRET = os.getenv("JWT_SECRET")
     
