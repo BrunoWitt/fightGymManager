@@ -54,3 +54,6 @@ Aplicação web para gestão de uma academia/centro de lutas, cobrindo **alunos,
 - PostgreSQL
 
 ---
+<img width="1919" height="946" alt="Screenshot_1" src="https://github.com/user-attachments/assets/dabfb116-5069-42dd-9dc7-3f7a82fd6c4a" />
+
+
